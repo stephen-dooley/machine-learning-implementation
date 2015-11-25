@@ -1,9 +1,12 @@
 
 # coding: utf-8
 
-# In[86]:
+# #### User input and Utility Functions
+
+# In[81]:
 
 import sys
+import numpy
 import numpy as np
 import csv
 from decimal import Decimal
@@ -107,17 +110,42 @@ def percentage_split_data(data, locations, percentage):
     return split_list;
 
 def convert_predictions_binary(results):
+    converted_rersult = []
     for row in results:
-        for index, prob in enumerate(row):
-            # replace the highest values with 1's
-            # replace all else with 0's
-            if max(row) == prob:
-                row[index] = 1;
-            else: 
-                row[index] = 0;
+        # create array of zeros for the number of classes
+        zeros = [0] * number_of_classes;
+        # find the max probability of the set
+        for index, el in enumerate(row):
+            if el == max(row):
+                index_of_max = index;
+        zeros[index_of_max] = 1;
+        
+        converted_rersult.append(zeros);
                 
-    return results;
+    return converted_rersult;
+
+def create_output_string(data):
+    # create string to save to output
+    output_string = ''
+    for index1, test in enumerate(data):
+        string = ''
+        for index2, val in enumerate(test):
+            int(val)
+            string += str(int(val))
+            if index2 < len(data[0])-1:
+                string += ','
+
+        output_string += string
+        output_string += '|'
+    
+    return output_string;
+
 #############################################################################################
+
+
+# #### Logistic Regression Class and Test Functionality
+
+# In[92]:
 
 
 ##################################### REGRESSION CLASS ######################################
@@ -136,14 +164,19 @@ class LogisticRegression(object):
         self.b = numpy.zeros(n_out)          # initialize bias 0
         self.params = [self.W, self.b]
 
-    def train_model(self, lr=0.0011, input=None, L2_reg=0.00):
+    # lr = learning rate
+    def train_model(self, lr=0.015, input=None, L2_reg=0.00):
         if input is not None:
             self.x = input
 
+        # find the predicted probabilties by running the sum of vector product of the input data
+        # & array of zeros and an array of zeros.
+        # on each iteration the value of self.W and self.b are calculated below
         prob_y_given_x = softmax(numpy.dot(self.x, self.W) + self.b)
+        # calculate the difference in the guessed probability and the actual value
         diff_y = self.y - prob_y_given_x
         
-        self.W += lr * numpy.dot(self.x.T, diff_y) - lr * L2_reg * self.W
+        self.W += (lr * numpy.dot(self.x.T, diff_y)) - (lr * L2_reg * self.W)
         self.b += lr * numpy.mean(diff_y, axis=0)
 
     def predict_probabilities(self, x):
@@ -153,7 +186,7 @@ class LogisticRegression(object):
 
 
 ####################################### TEST FUNCTION ########################################
-def test_algorithm(learning_rate=0.001, n_interations=1000):
+def test_algorithm(learning_rate=0.015, n_interations=500):
     training_percentage = 66
     testing_percentage = 100 - training_percentage
     
@@ -199,20 +232,43 @@ def test_algorithm(learning_rate=0.001, n_interations=1000):
     prediction_model = LogisticRegressionModel.predict_probabilities(normalised_testing_data_x)
     # convert the highst probabiility to a 1 and the others to a 0
     probabilities = convert_predictions_binary(prediction_model)
-    print(probabilities)
-    
+
     # compare the results to the actual value of the 
     testing_data_y = percentage_split_data(owl_types, test_sample_locations, None)
-    print('\n\n', np.asarray(testing_data_y))
+    
+    
+    output_string = create_output_string(probabilities)
+    output_string = output_string[:-1]
+    with open('../data/results/predictions', 'a') as predictions:
+        predictions.write(output_string)
+        predictions.write('\n')
+        
+    output_string = create_output_string(testing_data_y)
+    output_string = output_string[:-1]
+    with open('../data/results/actual-probabilities', 'a') as predictions:
+        predictions.write(output_string)
+        predictions.write('\n')
     
 #############################################################################################
 
 
+# #### Run Model
+
+# In[121]:
 
 ####################################### MAIN PROGRAM ########################################
 if __name__ == "__main__":
     test_algorithm()
+    print('Model Built\nPredictions Made');
 #############################################################################################
 
 
-# ### 
+# In[ ]:
+
+
+
+
+# In[ ]:
+
+
+
