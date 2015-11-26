@@ -52,10 +52,14 @@ ax1 = fig.add_subplot(111);
 cm_bright = ListedColormap(['#FF0000', '#0000FF']);
 
 ''' scatter(x, y, marker size, color, marker color style, label) '''
-ax1.scatter(np.arange(number_of_instances), df.body_length, color='red', cmap=cm_bright, label='body_length');
-ax1.scatter(np.arange(number_of_instances), df.wing_length, color='black', cmap=cm_bright, label='wing_length'); 
-ax1.scatter(np.arange(number_of_instances), df.body_width, color='blue', cmap=cm_bright, label='body_width'); 
-ax1.scatter(np.arange(number_of_instances), df.wing_width, color='green', cmap=cm_bright, label='wing_width');
+ax1.scatter(np.arange(number_of_instances), df.body_length, 
+            color='red', cmap=cm_bright, label='body_length');
+ax1.scatter(np.arange(number_of_instances), df.wing_length, 
+            color='black', cmap=cm_bright, label='wing_length'); 
+ax1.scatter(np.arange(number_of_instances), df.body_width, 
+            color='blue', cmap=cm_bright, label='body_width'); 
+ax1.scatter(np.arange(number_of_instances), df.wing_width, 
+            color='green', cmap=cm_bright, label='wing_width');
 ax1.scatter(x_divider_one, y_divider, s=1, color='black', cmap=cm_bright);
 ax1.scatter(x_divider_two, y_divider, s=1, color='black', cmap=cm_bright);
 ax1.set_xlim(0, number_of_instances)
@@ -367,7 +371,9 @@ def test_algorithm(learning_rate=0.015, n_interations=1000):
     y = percentage_split_data(owl_types, sample_locations, None)
 
     # build LogisticRegression model
-    LogisticRegressionModel = LogisticRegression(input=x, type_of_owl=y, n_in=(len(df.columns)-1), n_out=number_of_classes)
+    LogisticRegressionModel = LogisticRegression(input=x, type_of_owl=y, 
+                                                 n_in=(len(df.columns)-1), 
+                                                 n_out=number_of_classes)
 
     #### TRAIN MODEL ####
     for iteration in range(n_interations):
