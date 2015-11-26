@@ -2,12 +2,12 @@
 # coding: utf-8
 
 # <h2 align="center">Implementation of the Logistic Regression Classification Algorithm</h2>
-# <h4 align="center">Machine Learning & Data Mining - Assignment 3</h4>
-# <h4 align="center">Stephen Dooley - 12502947 - 23/11/15</h4> 
+# <h4 align="center">Machine Learning & Data Mining - Assignment III</h4>
+# <h4 align="center">Stephen Dooley - 12502947 - 26/11/15</h4> 
 
 # ### (1) Import Dataset
 
-# In[6]:
+# In[23]:
 
 import pandas as pd
 # import csv to visualise data
@@ -26,7 +26,7 @@ number_of_classes = int(input('How many types of owls are there?\n'));
 # 
 # Each instance contains data about the body length, wing length, body width and wing width of a given owl. The plot below illustrates the categorical data by dividing each of the owl types by a line separator. See the legend on the plot for more information.
 
-# In[7]:
+# In[24]:
 
 from matplotlib import pyplot as plt
 from matplotlib.colors import ListedColormap
@@ -65,16 +65,16 @@ ax1.set_ylabel('Length or Width');
 ax1.legend(loc='upper left');
 
 
-# ### (3) Data  and Testing Observations
-# As seen from the plot above, the attributes of the Long Eared Owl (left), are easily differentiated from the those of the Snowy Owl (middle) and Barn Owl (right). It is observed that the body length for all three types of owl is similiar. Although all three types of owl share similar body length it appears as though error in the algorithm may arrise when trying to distinguish between the Snowy Owl and Barn Owl. These two types of owl contain similar ranges of values for body length, wing length, body width and wing width. Training the model to distinguish the difference between the Snowy Owl (middle) and Barn Owl (right) will be the most difficult due to the similarities in their attributes.
+# ### (3) Data Observations and Test Plan
+# As seen from the plot above, the attributes of the Long Eared Owl (left), are easily differentiated from the those of the Snowy Owl (middle) and Barn Owl (right). It is observed that the body length for all three types of owl is similar. Although all three types of owl share similar body length it appears as though error in the algorithm may arise when trying to distinguish between the Snowy Owl and Barn Owl. These two types of owl contain similar ranges of values for body length, wing length, body width and wing width. Training the model to distinguish the difference between the Snowy Owl (middle) and Barn Owl (right) will be the most difficult due to the similarities in their attributes.
 # 
-# In logistic regression, the predictions of the model are constrained to the range [0,1]. This is to alow the value to be interpretted as an estimation of the probability. The estimated probability is used to predict which type of owl the instance in question belongs to. By using the logit function (inverse of logistic function), it is possible to translate the predictions from the range [−∞,∞] to [0,1]. It translates a *K*-dimensional vector $x$ of real values to a *K*-dimensional vector $\sigma(\mathbf{x})$ of real values in the range (0, 1). $\sigma(\mathbf{x})$ represents the predicted probablilties, and the sum of all probabilities of the vector $\sigma(\mathbf{x})$ add up to 1. The logistic function (or softmax function for multiclass tasks) of a number x between 0 and 1 is given by:
+# In logistic regression, the predictions of the model are constrained to the range [0,1]. This is to allow the value to be interpreted as an estimation of the probability. The estimated probability is used to predict which type of owl the instance in question belongs to. By using the logit function (inverse of logistic function), it is possible to translate the predictions from the range [−∞,∞] to [0,1]. It translates a *K*-dimensional vector $x$ of real values to a *K*-dimensional vector $\sigma(\mathbf{x})$ of real values in the range (0, 1). $\sigma(\mathbf{x})$ represents the predicted probabilities, and the sum of all probabilities of the vector $\sigma(\mathbf{x})$ add up to 1. The logistic function (or softmax function for multiclass tasks) of a number x between 0 and 1 is given by:
 # 
 # $$ \sigma(\mathbf{x})_j = \frac{e^{\mathbf{x}k}}{\sum_{k}^{K} e^{\mathbf{x}k}} $$
 # 
 # The graph of the logit function can be seen below:
 
-# In[8]:
+# In[25]:
 
 x = np.linspace(-10, 10, 100)
 y = 1.0 / (1.0 + np.exp(-x))
@@ -89,22 +89,23 @@ ax2.legend(loc='lower right')
 # 
 # The softmax function is used for multi-class problems such as this one (3 types of owl). The softmax function is given by (for vector x): $ \sigma(\mathbf{x})_j = \frac{e^{\mathbf{x}k}}{\sum_{k}^{K} e^{\mathbf{x}k}} $
 # 
-# Both functions bind the predicted probabilities to the range [0,1]. The softmax function is an adaptation of the sigmoid, whereby the vertor sum of the exponentials is the denominator.
+# Both functions bind the predicted probabilities to the range [0,1]. The softmax function is an adaptation of the sigmoid, whereby the vector sum of the exponentials is the denominator.
 # 
-# Two factors that heavily influence the performance of the model are the learning rate and the number of epochs the model is run for whilst training. The lower the learning rate, the slower it learns. With low learning rates it is easier to observe the changes in the predicticted probabilities as the model is trained. The number of iterations will affect the speed and accuracy of the model also. Running iterations infinitly will be worthless as the accuracy will plateau eventually. For this model, the acuuracy plateuad at approximately 500 iterations.
+# Two factors that heavily influence the performance of the model are the learning rate and the number of epochs the model is run for whilst training. The lower the learning rate, the slower it learns. With low learning rates it is easier to observe the changes in the predicted probabilities as the model is trained. The number of iterations will affect the speed and accuracy of the model also. Running iterations infinitely will be worthless as the accuracy will plateau eventually. For this model, the accuracy plateaued at approximately 500 iterations.
 
 # ### (5) Prepare Data
 # The data is divided into 2 files:
 # * The raw input data for each instance eg. [body length, body width, wing length, wing width]
 # * The type of owl for each instance.
 # 
-# The dataset contains 135 instances which is split 2/3 for training the model, and 1/3 for testing the model. The data is normalised by dividing each attribute (eg. body length) by the max value for the same attribute for all instances. 
+# The dataset contains 135 instances which is split 2/3 for training the model, and 1/3 for testing the model. The data for testing is entirely exclusive from the training data. All data used for training is omitted when testing. The data is normalised by dividing each attribute (eg. body length) by the max value for the same attribute for all instances. This can be done for datasets with all positive values like the owl dataset. 
 
 # ### (6) Results
-# The precision of the algorithm is given by dividing the True Positives (TP) plus the True Negatives (TP) divided by the total number of instances.
+# The precision of the algorithm is given by dividing the True Positives (TP) plus the True Negatives (TN) divided by the total number of instances tested.
 
-# In[12]:
+# In[26]:
 
+# read the results in from the file
 with open('../data/results/predictions') as predictions:
     for line in predictions:
         list_of_predictions = [line.split('|') for row in predictions]
@@ -115,9 +116,11 @@ with open('../data/results/actual-probabilities') as actual:
 
 print('Calculating the number of true positives for each of the %s tests...' % len(list_of_actual))
 print('Calculating the average accuracy for tests...')
+
 num_of_instances = 0
 precision = []
 matches = 0
+# get the number of TP per test and and calculate average accuracy
 for index, test in enumerate(list_of_predictions):
     num_of_instances = len(test)
     matches = 0
@@ -126,12 +129,15 @@ for index, test in enumerate(list_of_predictions):
             matches += 1;
             
     precision.append(matches);
-
+    
 precision_of_algoirthm = (sum(precision)/len(precision))/num_of_instances*100
 print('Accuracy of the algorithm on testing is %s' % precision_of_algoirthm, '%')
 
 
-# In[ ]:
+# ### (7) How to Run the Program
+# 
+# * Download source code and run *logistic_regression_implementation.py*
+# * Follow on-screen prompts for user inputs
+# * Once the model has been trained and tested, preview the accuracy by running the program stephen_dooley_report.py
 
-
-
+# This model was built on iPython notebooks by Jupyter.
