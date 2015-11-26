@@ -1,9 +1,9 @@
 
 # coding: utf-8
 
-# #### User input and Utility Functions
+# #### User Input and Utility Functions
 
-# In[81]:
+# In[125]:
 
 import sys
 import numpy
@@ -75,7 +75,7 @@ def normalise_data(data):
 # range of 0 --> 1. The outputs can then be interpretted as a 
 # probability or odds.
 #
-# @params {Object} x - data to train/test on 
+# @params {list} x - data to train/test on 
 def softmax(x):
     # e = numpy.exp(x - numpy.max(x))  # prevent overflow
     e = numpy.exp(x)
@@ -109,6 +109,12 @@ def percentage_split_data(data, locations, percentage):
 
     return split_list;
 
+# convert_predictions_binary
+#
+# Convert the highest predicted probabilities to 1
+# otherwise set as 0
+#
+# @params {list} results - results from testing model
 def convert_predictions_binary(results):
     converted_rersult = []
     for row in results:
@@ -124,6 +130,12 @@ def convert_predictions_binary(results):
                 
     return converted_rersult;
 
+# create_output_string
+#
+# Create maniplative string to write to file
+# Makes it easier to read back the results
+#
+# @params {list} data - results from testing model
 def create_output_string(data):
     # create string to save to output
     output_string = ''
@@ -145,7 +157,7 @@ def create_output_string(data):
 
 # #### Logistic Regression Class and Test Functionality
 
-# In[92]:
+# In[151]:
 
 
 ##################################### REGRESSION CLASS ######################################
@@ -164,6 +176,7 @@ class LogisticRegression(object):
         self.b = numpy.zeros(n_out)          # initialize bias 0
         self.params = [self.W, self.b]
 
+    # train the model
     # lr = learning rate
     def train_model(self, lr=0.015, input=None, L2_reg=0.00):
         if input is not None:
@@ -173,12 +186,15 @@ class LogisticRegression(object):
         # & array of zeros and an array of zeros.
         # on each iteration the value of self.W and self.b are calculated below
         prob_y_given_x = softmax(numpy.dot(self.x, self.W) + self.b)
-        # calculate the difference in the guessed probability and the actual value
+        # calculate the difference in the predited probability and the actual value
         diff_y = self.y - prob_y_given_x
-        
+        # append to the value of self.W and self.B on every iteration
         self.W += (lr * numpy.dot(self.x.T, diff_y)) - (lr * L2_reg * self.W)
+        # multiply the learning rate by the mean of the difference in the actual vs. prediction
         self.b += lr * numpy.mean(diff_y, axis=0)
-
+    
+    
+    # test the model
     def predict_probabilities(self, x):
         return softmax(numpy.dot(x, self.W) + self.b)
 #############################################################################################
@@ -186,7 +202,7 @@ class LogisticRegression(object):
 
 
 ####################################### TEST FUNCTION ########################################
-def test_algorithm(learning_rate=0.015, n_interations=500):
+def test_algorithm(learning_rate=0.015, n_interations=1000):
     training_percentage = 66
     testing_percentage = 100 - training_percentage
     
@@ -196,7 +212,7 @@ def test_algorithm(learning_rate=0.015, n_interations=500):
     number_of_samples = int( len(input_data)*(training_percentage/100) )
     # list of indices to sample the data with
     sample_locations = rnd.sample(range(len(input_data)), number_of_samples)
-            
+    
     # get percentage of dataset for training
     sampled_input_data = percentage_split_data(input_data, sample_locations, None)
     # normalize the data
@@ -213,7 +229,7 @@ def test_algorithm(learning_rate=0.015, n_interations=500):
     #### TRAIN MODEL ####
     for iteration in range(n_interations):
         LogisticRegressionModel.train_model(lr=learning_rate)
-        learning_rate *= 0.95
+        learning_rate *= 0.96
                 
 
     #### TEST MODEL ####
@@ -254,21 +270,11 @@ def test_algorithm(learning_rate=0.015, n_interations=500):
 
 # #### Run Model
 
-# In[121]:
+# In[152]:
 
 ####################################### MAIN PROGRAM ########################################
 if __name__ == "__main__":
     test_algorithm()
     print('Model Built\nPredictions Made');
 #############################################################################################
-
-
-# In[ ]:
-
-
-
-
-# In[ ]:
-
-
 
